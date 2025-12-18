@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Verification System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Candidate Authenticity Verification</h1>
+            <p class="subtitle">AI-Powered Fraud Detection for Tech Recruitment</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-button active" data-tab="comprehensive">Comprehensive Check</button>
+            <button class="tab-button" data-tab="batch">Batch Processing</button>
+            <button class="tab-button" data-tab="resume">Resume Only</button>
+            <button class="tab-button" data-tab="linkedin">LinkedIn Checker</button>
+            <button class="tab-button" data-tab="interview">Interview Helper</button>
+        </nav>
+
+        <!-- Comprehensive Verification Tab -->
+        <div id="comprehensive" class="tab-content active">
+            <div class="upload-section">
+                <h2>Complete Candidate Verification</h2>
+                <p>Upload resume and provide candidate information for comprehensive fraud detection.</p>
+
+                <form id="comprehensive-form" class="verification-form">
+                    <div class="form-group">
+                        <label for="resume-file">Resume (PDF, DOCX, or TXT)</label>
+                        <div class="file-upload">
+                            <input type="file" id="resume-file" name="file" accept=".pdf,.docx,.txt" required>
+                            <span class="file-name">No file selected</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="candidate-name">Candidate Name</label>
+                            <input type="text" id="candidate-name" name="name" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="candidate-email">Email Address</label>
+                            <input type="email" id="candidate-email" name="email" placeholder="john@example.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="candidate-phone">Phone Number</label>
+                            <input type="tel" id="candidate-phone" name="phone" placeholder="+1 (555) 123-4567">
+                        </div>
+                        <div class="form-group">
+                            <label for="candidate-location">Location</label>
+                            <input type="text" id="candidate-location" name="location" placeholder="San Francisco, CA">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="linkedin-url">LinkedIn Profile URL</label>
+                        <input type="url" id="linkedin-url" name="linkedin_url" placeholder="https://linkedin.com/in/johndoe">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="job-description">Job Description (Optional)</label>
+                        <textarea id="job-description" name="job_description" rows="6" placeholder="Paste the job description here to check for suspicious matches..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="verify-btn">
+                        <span class="btn-text">Run Comprehensive Verification</span>
+                        <span class="loader" style="display: none;"></span>
+                    </button>
+                </form>
+            </div>
+
+            <div id="results-section" class="results-section" style="display: none;">
+                <h2>Verification Results</h2>
+                <div id="results-content"></div>
+            </div>
+        </div>
+
+        <!-- Batch Processing Tab -->
+        <div id="batch" class="tab-content">
+            <div class="upload-section">
+                <h2>📁 Batch Resume Processing</h2>
+                <p>Upload multiple resumes from a folder for automated fraud detection. Perfect for screening large applicant pools.</p>
+
+                <form id="batch-form" class="verification-form">
+                    <div class="form-group">
+                        <label for="batch-files">Select Folder or Multiple Files</label>
+                        <div class="file-upload batch-upload">
+                            <input type="file" id="batch-files" name="files" accept=".pdf,.docx,.txt" multiple webkitdirectory directory>
+                            <span class="file-name" id="batch-file-count">No files selected</span>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">
+                            💡 <strong>Tip:</strong> Click "Choose Files" to select a folder, or use Ctrl/Cmd+Click to select multiple individual files
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="job-desc-batch">Job Description (Optional)</label>
+                        <textarea id="job-desc-batch" name="job_description" rows="6" placeholder="Paste job description to check all resumes against it..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="batch-verify-btn">
+                        <span class="btn-text">Process All Resumes</span>
+                        <span class="loader" style="display: none;"></span>
+                    </button>
+
+                    <div id="batch-progress" style="display: none; margin-top: 20px;">
+                        <div style="background: var(--bg-primary); padding: 15px; border-radius: 6px;">
+                            <p style="margin-bottom: 10px;">Processing resumes...</p>
+                            <div style="background: var(--bg-secondary); height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div id="progress-bar" style="background: var(--accent-primary); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+                            </div>
+                            <p id="progress-text" style="margin-top: 10px; font-size: 0.9rem; color: var(--text-secondary);">0 / 0 processed</p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div id="batch-results-section" class="results-section" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px;">
+                    <h2 style="margin: 0;">Batch Processing Results</h2>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button id="export-html-report-btn" class="btn-secondary">
+                            📄 HTML Report
+                        </button>
+                        <button id="export-csv-btn" class="btn-secondary">
+                            📊 CSV Export
+                        </button>
+                        <button id="organize-files-btn" class="btn-secondary">
+                            📁 Organize by Risk
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Summary Stats -->
+                <div id="batch-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                    <!-- Stats will be inserted here -->
+                </div>
+
+                <!-- Filters and Sort -->
+                <div style="background: var(--bg-primary); padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                        <div>
+                            <label style="margin-right: 8px; color: var(--text-secondary);">Filter by Risk:</label>
+                            <select id="risk-filter" style="padding: 8px 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                                <option value="all">All Levels</option>
+                                <option value="CRITICAL">Critical Only</option>
+                                <option value="HIGH">High Only</option>
+                                <option value="MEDIUM">Medium Only</option>
+                                <option value="LOW">Low Only</option>
+                                <option value="MINIMAL">Minimal Only</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="margin-right: 8px; color: var(--text-secondary);">Sort by:</label>
+                            <select id="sort-order" style="padding: 8px 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                                <option value="risk-desc">Risk (High to Low)</option>
+                                <option value="risk-asc">Risk (Low to High)</option>
+                                <option value="name-asc">Name (A-Z)</option>
+                                <option value="name-desc">Name (Z-A)</option>
+                            </select>
+                        </div>
+                        <div style="margin-left: auto;">
+                            <label style="margin-right: 8px;">
+                                <input type="checkbox" id="ai-only-filter" style="margin-right: 5px;">
+                                AI-Generated Only
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Table -->
+                <div id="batch-results-table" style="overflow-x: auto;">
+                    <!-- Table will be inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Resume Only Tab -->
+        <div id="resume" class="tab-content">
+            <div class="upload-section">
+                <h2>Resume Analysis</h2>
+                <p>Analyze resume for AI-generated content, inconsistencies, and fraud indicators.</p>
+
+                <form id="resume-form" class="verification-form">
+                    <div class="form-group">
+                        <label for="resume-file-only">Resume File</label>
+                        <div class="file-upload">
+                            <input type="file" id="resume-file-only" name="file" accept=".pdf,.docx,.txt" required>
+                            <span class="file-name">No file selected</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="job-desc-resume">Job Description (Optional)</label>
+                        <textarea id="job-desc-resume" name="job_description" rows="6" placeholder="Paste job description to check for suspicious matches..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <span class="btn-text">Analyze Resume</span>
+                        <span class="loader" style="display: none;"></span>
+                    </button>
+                </form>
+            </div>
+
+            <div id="resume-results" class="results-section" style="display: none;">
+                <h2>Resume Analysis Results</h2>
+                <div id="resume-results-content"></div>
+            </div>
+        </div>
+
+        <!-- LinkedIn Checker Tab -->
+        <div id="linkedin" class="tab-content">
+            <div class="upload-section">
+                <h2>LinkedIn Profile Verification</h2>
+                <p>Get a comprehensive checklist for verifying LinkedIn profile authenticity.</p>
+
+                <form id="linkedin-form" class="verification-form">
+                    <div class="form-group">
+                        <label for="linkedin-profile-url">LinkedIn Profile URL</label>
+                        <input type="url" id="linkedin-profile-url" name="profile_url" placeholder="https://linkedin.com/in/username" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <span class="btn-text">Generate Verification Checklist</span>
+                        <span class="loader" style="display: none;"></span>
+                    </button>
+                </form>
+            </div>
+
+            <div id="linkedin-results" class="results-section" style="display: none;">
+                <h2>LinkedIn Verification Checklist</h2>
+                <div id="linkedin-results-content"></div>
+            </div>
+        </div>
+
+        <!-- Interview Helper Tab -->
+        <div id="interview" class="tab-content">
+            <div class="upload-section">
+                <h2>Interview Fraud Detection Guide</h2>
+                <p>Red flags and detection techniques for identifying cheating during interviews.</p>
+
+                <div class="info-card">
+                    <h3>🎯 Common Interview Fraud Patterns</h3>
+
+                    <div class="fraud-category">
+                        <h4>Impersonation</h4>
+                        <ul>
+                            <li>Person in interview is not the same as resume/profile</li>
+                            <li>Request government-issued ID verification during screening</li>
+                            <li>Use reverse image search if ID is provided digitally</li>
+                        </ul>
+                    </div>
+
+                    <div class="fraud-category">
+                        <h4>Outside Assistance (Shadowing / AI Help)</h4>
+                        <p><strong>Audio/Video Clues:</strong></p>
+                        <ul>
+                            <li>Echoes or background voices</li>
+                            <li>Unnatural pauses before answering</li>
+                            <li>Frequent off-screen glances</li>
+                            <li>Audio relay setup (unusual delays)</li>
+                        </ul>
+
+                        <p><strong>Response Patterns:</strong></p>
+                        <ul>
+                            <li>Overly perfect, structured sentences</li>
+                            <li>Rehearsed-sounding answers lacking reasoning</li>
+                            <li>Repetitive phrasing or paraphrasing questions</li>
+                            <li>Avoidance of conversational topics/small talk</li>
+                            <li>Cannot recall previous interview stages or email exchanges</li>
+                        </ul>
+                    </div>
+
+                    <div class="fraud-category">
+                        <h4>🛡️ Detection Techniques</h4>
+
+                        <div class="detection-technique">
+                            <h5>1. Context Recall Test</h5>
+                            <p>Reference previous interview stages or specific email exchanges. AI tools and shadow engineers won't have this context.</p>
+                            <div class="example">
+                                <strong>Example:</strong> "In your email last week, you mentioned you worked with Kubernetes at your previous company. Can you tell me more about that?"
+                            </div>
+                        </div>
+
+                        <div class="detection-technique">
+                            <h5>2. Progressive Drilling</h5>
+                            <p>Select one project and probe progressively deeper. Real experience will show depth; fabricated experience will show inconsistencies.</p>
+                            <div class="example">
+                                <strong>Example:</strong> "Tell me about your CI/CD pipeline" → "What tool did you use?" → "How did you handle failures?" → "What was your retry logic?" → "Show me the code structure"
+                            </div>
+                        </div>
+
+                        <div class="detection-technique">
+                            <h5>3. Counterintuitive Questions</h5>
+                            <p>Use niche questions with known pitfalls. Candidates may get them wrong, but AI will get them wrong with confidence.</p>
+                            <div class="example">
+                                <strong>For DevOps:</strong> Ask about PowerShell or Power BI with deliberately misleading context. AI models often confuse these tools.
+                            </div>
+                        </div>
+
+                        <div class="detection-technique">
+                            <h5>4. Behavioral Deep Dive</h5>
+                            <p>Ask about failures, conflicts, or production incidents. Real engineers provide detailed, situational answers with emotion.</p>
+                            <div class="example">
+                                <strong>Example:</strong> "Tell me about a time when a deployment went badly wrong. What happened, how did you feel, and what did you do?"
+                            </div>
+                        </div>
+
+                        <div class="detection-technique">
+                            <h5>5. AI Sycophancy Test</h5>
+                            <p>Pose questions with no definitive answer or multiple valid perspectives. AI tends to provide confident but incorrect answers rather than admitting uncertainty.</p>
+                            <div class="example">
+                                <strong>Example:</strong> "What's the best way to structure a microservices architecture?" (There's no single "best" way - real engineers will ask clarifying questions)
+                            </div>
+                        </div>
+
+                        <div class="detection-technique">
+                            <h5>6. Terminology Recall Trap</h5>
+                            <p>Ask extremely detailed questions where correct answers involve domain-specific terms that aren't easily recallable.</p>
+                            <div class="example">
+                                <strong>Example:</strong> "What's the difference between 2NF and 3NF in database normalization?" or "Explain PowerShell's Type Memory Space"
+                            </div>
+                            <p class="tip">Pre-test these questions against AI models to identify common wrong answers.</p>
+                        </div>
+                    </div>
+
+                    <div class="fraud-category">
+                        <h4>⚠️ Interview Red Flag Checklist</h4>
+                        <div class="checklist">
+                            <label><input type="checkbox"> Audio quality issues (echo, relay delays)</label>
+                            <label><input type="checkbox"> Frequent off-screen glances</label>
+                            <label><input type="checkbox"> Unnatural pauses before answering</label>
+                            <label><input type="checkbox"> Overly perfect grammar and sentence structure</label>
+                            <label><input type="checkbox"> Avoids conversational topics</label>
+                            <label><input type="checkbox"> Cannot recall previous interview context</label>
+                            <label><input type="checkbox"> Provides rehearsed-sounding answers</label>
+                            <label><input type="checkbox"> Paraphrases questions in responses</label>
+                            <label><input type="checkbox"> Lacks depth when drilling into projects</label>
+                            <label><input type="checkbox"> Confident but incorrect answers to trick questions</label>
+                            <label><input type="checkbox"> Cannot explain reasoning behind answers</label>
+                            <label><input type="checkbox"> No personal anecdotes or emotional responses</label>
+                        </div>
+                        <p class="warning"><strong>3+ red flags:</strong> High probability of fraud - terminate interview and reject candidate</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Based on "DevOps - Candidate Authenticity Assessment" (v1.0.1) | Built for fraud prevention in tech recruiting</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
